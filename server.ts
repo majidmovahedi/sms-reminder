@@ -1,12 +1,18 @@
-import express, { Request, Response } from "express";
+import express from "express";
+import dotenv from "dotenv";
+import apiVersionRouter from "./src/routes/api/apiVersionRouter";
 
 const app = express();
-const port = 3000;
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello, TypeScript with Express!");
-});
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ type: "application/json" }));
+
+dotenv.config();
+const port = process.env.PORT;
+
+
+app.use("/api", apiVersionRouter);
 
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Listening On Port ${port}`);
 });
