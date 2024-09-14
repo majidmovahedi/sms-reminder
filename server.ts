@@ -10,7 +10,6 @@ app.use(express.json({ type: "application/json" }));
 dotenv.config();
 const port = process.env.PORT;
 
-
 app.use("/api", apiVersionRouter);
 
 app.listen(port, () => {
