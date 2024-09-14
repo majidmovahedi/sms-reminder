@@ -6,7 +6,7 @@ services:
     depends_on:
       - mongo
     environment:
-      - MONGO_URI=mongodb://mongo:27017/smsreminderdb
+      - MONGO_URI=mongodb://localhost:27017/mydatabase
     volumes:
       - .:/usr/src/app
     command: npm run start
