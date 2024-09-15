@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
-import mongoose from 'mongoose';
-import User from './../../../models/userModel';
+import User from '@models/userModel';
 
 // export const listUsers = (req: Request, res: Response): void => {
 //     res.send('List of users');

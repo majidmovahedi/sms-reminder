@@ -1,7 +1,8 @@
+import "module-alias/register";
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import apiVersionRouter from "./src/routes/api/apiVersionRouter";
+import apiVersionRouter from "@routes/api/apiVersionRouter";
 
 const app = express();
 
