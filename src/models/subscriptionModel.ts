@@ -40,7 +40,7 @@ const SubscriptionSchema: Schema<ISubscription> = new Schema({
 });
 
 const Subscription = mongoose.model<ISubscription>(
-    'Reminder',
+    'Subscription',
     SubscriptionSchema,
 );
 
