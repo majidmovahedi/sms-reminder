@@ -18,7 +18,6 @@ app.use("/api", apiVersionRouter);
 mongoose
   .connect("mongodb://localhost:27017/mydatabase")
   .then(() => console.log("MongoDB Connected!"));
-// mongoose.Promise = global.Promise;
 
 app.listen(port, () => {
   console.log(`Listening On Port ${port}`);

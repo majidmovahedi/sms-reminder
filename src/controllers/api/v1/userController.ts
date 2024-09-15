@@ -23,8 +23,8 @@ export async function register(req: Request, res: Response) {
         const user = new User({ fullname, phoneNumber, password });
         await user.save();
         res.status(201).json({ message: 'User registered' });
-    } catch (err) {
-        //   res.status(400).json({ error: err.message });
+    } catch (error) {
+        res.status(400).json(error);
     }
 }
 
@@ -45,7 +45,7 @@ export async function login(req: Request, res: Response) {
         });
 
         res.json({ token: `Bearer ${token}` });
-    } catch (err) {
-        // res.status(500).json({ error: err.message });
+    } catch (error) {
+        res.status(500).json(error);
     }
 }
