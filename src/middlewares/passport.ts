@@ -1,6 +1,6 @@
 import passport from 'passport';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
-import User from '@models/userModel';
+import User, { IUser } from '@models/userModel';
 
 // JWT options
 const jwtOptions = {
@@ -10,18 +10,23 @@ const jwtOptions = {
 
 // JWT Strategy
 passport.use(
-    new JwtStrategy(jwtOptions, async (jwtPayload, done) => {
-        try {
-            // Find the user based on the payload
-            const user = await User.findById(jwtPayload.id);
-            if (!user) {
-                return done(null, false);
+    new JwtStrategy(
+        jwtOptions,
+        async (
+            jwtPayload: any,
+            done: (err: any, user?: IUser | false) => void,
+        ) => {
+            try {
+                const user = await User.findById(jwtPayload.id).exec();
+                if (!user) {
+                    return done(null, false);
+                }
+                return done(null, user);
+            } catch (err) {
+                return done(err, false);
             }
-            return done(null, user);
-        } catch (err) {
-            return done(err, false);
-        }
-    }),
+        },
+    ),
 );
 
 export default passport;

@@ -1,12 +1,13 @@
-import { Request, Response } from 'express';
-import User from '@models/userModel';
+import express, { Request, Response } from 'express';
+import User, { IUser } from '@models/userModel';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
-export async function singleUser(req: Request, res: Response) {
+export async function singleUser(req: express.Request, res: express.Response) {
+    const userId = (req.user as IUser)._id;
     try {
-        const user = await User.findById({ _id: '66e5bff1e05660c87665502f' });
+        const user = await User.findById({ _id: userId });
         if (!user) {
             return res.json('This User Does Not Exist!');
             // return null;
