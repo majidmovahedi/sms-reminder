@@ -5,7 +5,7 @@
   "main": "server.ts",
   "_moduleAliases": {
     "@controllers": "./src/controllers",
-    "@middleware": "./src/middlewares",
+    "@middlewares": "./src/middlewares",
     "@models": "./src/models",
     "@routes": "./src/routes",
     "@utils": "./src/utils"

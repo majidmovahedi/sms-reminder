@@ -2,16 +2,17 @@ import { Request, Response } from 'express';
 import User from '@models/userModel';
 import jwt from 'jsonwebtoken';
 
-export async function listUsers(req: Request, res: Response) {
+const JWT_SECRET = process.env.JWT_SECRET as string;
+
+export async function singleUser(req: Request, res: Response) {
     try {
-        const user = await User.find();
-        if (user) {
-            console.log('User found:', user);
-            return user;
-        } else {
-            console.log('User not found');
-            return null;
+        const user = await User.findById({ _id: '66e5bff1e05660c87665502f' });
+        if (!user) {
+            return res.json('This User Does Not Exist!');
+            // return null;
         }
+        return res.status(200).json(user);
+        // return user;
     } catch (err) {
         console.error('Error finding user by ID:', err);
     }
@@ -29,23 +30,34 @@ export async function register(req: Request, res: Response) {
 }
 
 export async function login(req: Request, res: Response) {
-    const { phoneNumber, password } = req.body;
     try {
+        const { phoneNumber, password } = req.body;
+
+        // Find user by phone number
         const user = await User.findOne({ phoneNumber });
-        if (!user)
-            return res.status(404).json({ error: 'User Does Not Exist!' });
+        if (!user) {
+            return res
+                .status(401)
+                .json({ error: 'Invalid phone number or password' });
+        }
 
+        // Check if password matches
         const isMatch = await user.comparePassword(password);
-        if (!isMatch)
-            return res.status(400).json({ error: 'Password is Incorrect!' });
+        if (!isMatch) {
+            return res
+                .status(401)
+                .json({ error: 'Invalid phone number or password' });
+        }
 
-        const payload = { id: user._id };
-        const token = jwt.sign(payload, 'your_jwt_secret', {
+        // Generate JWT token
+        const token = jwt.sign({ id: user._id }, 'secret', {
             expiresIn: '24h',
         });
 
-        res.json({ token: `Bearer ${token}` });
-    } catch (error) {
-        res.status(500).json(error);
+        // Send the token to the client
+        res.json({ token });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
     }
 }
