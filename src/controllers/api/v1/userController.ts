@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import User, { IUser } from '@models/userModel';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET as string;
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 export async function singleUser(req: express.Request, res: express.Response) {
     const userId = (req.user as IUser)._id;
@@ -10,10 +10,8 @@ export async function singleUser(req: express.Request, res: express.Response) {
         const user = await User.findById({ _id: userId });
         if (!user) {
             return res.json('This User Does Not Exist!');
-            // return null;
         }
         return res.status(200).json(user);
-        // return user;
     } catch (err) {
         console.error('Error finding user by ID:', err);
     }
@@ -51,11 +49,9 @@ export async function login(req: Request, res: Response) {
         }
 
         // Generate JWT token
-        const token = jwt.sign({ id: user._id }, 'secret', {
+        const token = jwt.sign({ id: user._id }, JWT_SECRET, {
             expiresIn: '24h',
         });
-
-        // Send the token to the client
         res.json({ token });
     } catch (err) {
         console.error(err);

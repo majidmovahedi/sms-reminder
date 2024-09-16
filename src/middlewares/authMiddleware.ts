@@ -3,7 +3,7 @@ import passport from '@middlewares/passport';
 import { IUser } from '@models/userModel';
 
 // Middleware to protect routes
-export const authenticateJWT = (
+export const authMiddleware = (
     req: Request,
     res: Response,
     next: NextFunction,
@@ -15,8 +15,6 @@ export const authenticateJWT = (
             if (err)
                 return res.status(500).json({ error: 'Internal Server Error' });
             if (!user) return res.status(401).json({ error: 'Unauthorized' });
-
-            // Attach the user to the request object
             req.user = user;
             next();
         },

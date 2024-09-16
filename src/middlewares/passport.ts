@@ -5,7 +5,7 @@ import User, { IUser } from '@models/userModel';
 // JWT options
 const jwtOptions = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: 'secret',
+    secretOrKey: process.env.JWT_SECRET || 'your-secret-key',
 };
 
 // JWT Strategy
@@ -21,6 +21,7 @@ passport.use(
                 if (!user) {
                     return done(null, false);
                 }
+                // console.log('JWT Secret:', jwtOptions.secretOrKey);
                 return done(null, user);
             } catch (err) {
                 return done(err, false);
