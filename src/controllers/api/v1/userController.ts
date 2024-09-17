@@ -2,6 +2,8 @@ import express, { Request, Response } from 'express';
 import User, { IUser } from '@models/userModel';
 import jwt from 'jsonwebtoken';
 import { sendSMS } from '@utils/sms/sendSms';
+import { getRandomInt } from '@utils/sms/codeGenerator';
+import redisClient from '@configs/redisClient';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -21,8 +23,17 @@ export async function singleUser(req: express.Request, res: express.Response) {
 export async function register(req: Request, res: Response) {
     const { fullname, phoneNumber, password } = req.body;
     try {
+        const generateCode = getRandomInt();
         const user = new User({ fullname, phoneNumber, password });
         await user.save();
+
+        await redisClient.setEx(
+            user._id.toString(),
+            300,
+            generateCode.toString(),
+        );
+        await sendSMS(`Your Activation Code is ${generateCode}`, phoneNumber);
+
         return res.status(201).json({ message: 'User registered' });
     } catch (error) {
         return res.status(400).json(error);
@@ -53,8 +64,7 @@ export async function login(req: Request, res: Response) {
         const token = jwt.sign({ id: user._id }, JWT_SECRET, {
             expiresIn: '24h',
         });
-        sendSMS('hi again', '09154888171');
-        res.json({ token });
+        return res.json({ token });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Server error' });

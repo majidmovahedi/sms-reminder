@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const sendSMS = (msg: string, mobile: string) => {
+export const sendSMS = async (msg: string, mobile: string) => {
     const data = JSON.stringify({
         lineNumber: 30007487129399,
         messageText: msg,
@@ -21,7 +21,8 @@ export const sendSMS = (msg: string, mobile: string) => {
 
     axios(config)
         .then(function (response) {
-            console.log(JSON.stringify(response.data));
+            JSON.stringify(response.data);
+            // console.log(JSON.stringify(response.data));
         })
         .catch(function (error) {
             console.log(error);
