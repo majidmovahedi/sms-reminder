@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import User, { IUser } from '@models/userModel';
 import jwt from 'jsonwebtoken';
+import { sendSMS } from '@utils/sms/sendSms';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -52,6 +53,7 @@ export async function login(req: Request, res: Response) {
         const token = jwt.sign({ id: user._id }, JWT_SECRET, {
             expiresIn: '24h',
         });
+        sendSMS('hi again', '09154888171');
         res.json({ token });
     } catch (err) {
         console.error(err);
