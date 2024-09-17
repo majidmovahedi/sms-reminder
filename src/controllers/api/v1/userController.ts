@@ -22,9 +22,9 @@ export async function register(req: Request, res: Response) {
     try {
         const user = new User({ fullname, phoneNumber, password });
         await user.save();
-        res.status(201).json({ message: 'User registered' });
+        return res.status(201).json({ message: 'User registered' });
     } catch (error) {
-        res.status(400).json(error);
+        return res.status(400).json(error);
     }
 }
 
