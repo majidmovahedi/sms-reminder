@@ -5,7 +5,7 @@ import { sendSMS } from '@utils/sms/sendSms';
 import { getRandomInt } from '@utils/sms/codeGenerator';
 import redisClient from '@configs/redisClient';
 import { Types } from 'mongoose';
-import { UserRegisterSchema } from '@utils/validation/validationSchema';
+import { UserLoginSchema, UserRegisterSchema } from '@utils/validation/validationSchema';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -45,7 +45,7 @@ export async function register(req: Request, res: Response) {
 
 export async function login(req: Request, res: Response) {
     try {
-        const { phoneNumber, password } = req.body;
+        const { phoneNumber, password } = UserLoginSchema.parse(req.body);
 
         // Find user by phone number
         const user = await User.findOne({ phoneNumber });
