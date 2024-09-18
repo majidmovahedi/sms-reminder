@@ -30,7 +30,8 @@
     "mongoose": "^8.6.2",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
-    "redis": "^4.7.0"
+    "redis": "^4.7.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
