@@ -5,7 +5,10 @@ import { sendSMS } from '@utils/sms/sendSms';
 import { getRandomInt } from '@utils/sms/codeGenerator';
 import redisClient from '@configs/redisClient';
 import { Types } from 'mongoose';
-import { UserLoginSchema, UserRegisterSchema } from '@utils/validation/validationSchema';
+import {
+    UserLoginSchema,
+    UserRegisterSchema,
+} from '@utils/validation/validationSchema';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -96,6 +99,36 @@ export async function verify(req: Request, res: Response) {
         } else {
             res.status(400).json({ error: 'Invalid or expired OTP' });
         }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+}
+
+export async function resend(req: Request, res: Response) {
+    try {
+        const { phoneNumber } = req.body;
+
+        // Find user by phone number
+        const user = await User.findOne({ phoneNumber });
+        if (!user) {
+            return res
+                .status(401)
+                .json({ error: 'phone number does not exist!' });
+        }
+        if (user.isActive == true) {
+            return res.status(409).json({ error: 'This user is Active!' });
+        }
+        const generateCode = getRandomInt();
+
+        await redisClient.setEx(
+            user._id.toString(),
+            300,
+            generateCode.toString(),
+        );
+        console.log(generateCode);
+        await sendSMS(`Your Activation Code is ${generateCode}`, phoneNumber);
+        return res.status(200).json({ message: 'Code Send to Mobile' });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Server error' });

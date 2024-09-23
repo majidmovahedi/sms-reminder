@@ -3,6 +3,7 @@ import {
     login,
     register,
     verify,
+    resend,
 } from '@controllers/api/v1/userController';
 import { authMiddleware } from '@middlewares/authMiddleware';
 import { Router } from 'express';
@@ -13,5 +14,6 @@ router.get('/', authMiddleware, singleUser);
 router.post('/register', register);
 router.post('/login', login);
 router.post('/verify', verify);
+router.post('/resend', resend);
 
 export default router;
