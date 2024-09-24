@@ -129,7 +129,6 @@ export async function resendController(req: Request, res: Response) {
             300,
             generateCode.toString(),
         );
-        console.log(generateCode);
         await sendSMS(`Your Activation Code is ${generateCode}`, phoneNumber);
         return res.status(200).json({ message: 'Code Send to Mobile' });
     } catch (err) {
@@ -159,9 +158,36 @@ export async function forgetPasswordController(req: Request, res: Response) {
             300,
             generateCode.toString(),
         );
-        console.log(generateCode);
         await sendSMS(`Your Recover Code is ${generateCode}`, phoneNumber);
         return res.status(200).json({ message: 'Code Send to Mobile' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+}
+
+export async function newPasswordController(req: Request, res: Response) {
+    try {
+        const { phoneNumber, code, newPassword } = req.body;
+
+        // Find user by phone number
+        const user = await User.findOne({ phoneNumber });
+        if (!user) {
+            return res
+                .status(401)
+                .json({ error: 'phone number does not exist!' });
+        }
+        const userIdStr =
+            user._id instanceof Types.ObjectId ? user._id.toString() : user._id;
+
+        const storedOtp = await redisClient.get(userIdStr);
+
+        if (storedOtp === code) {
+            await User.findByIdAndUpdate(user, { password: newPassword });
+            return res.json({ message: 'Your password is Changed!' });
+        } else {
+            res.status(400).json({ error: 'Invalid or expired OTP' });
+        }
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Server error' });
