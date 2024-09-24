@@ -193,3 +193,21 @@ export async function newPasswordController(req: Request, res: Response) {
         res.status(500).json({ error: 'Server error' });
     }
 }
+
+// export async function changePasswordController(req: Request, res: Response) {}
+
+export async function updateProfileController(req: Request, res: Response) {
+    const userId = (req.user as IUser)._id;
+    try {
+        const { fullname } = req.body;
+
+        const user = await User.findById({ _id: userId });
+        if (!user) {
+            return res.json('This User Does Not Exist!');
+        }
+        await User.findByIdAndUpdate(user, { fullname: fullname });
+        return res.status(200).json('Your Name Changed Succesfully!');
+    } catch (err) {
+        console.error('Error During Update User Profile ', err);
+    }
+}
