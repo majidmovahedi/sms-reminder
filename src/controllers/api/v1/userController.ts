@@ -5,6 +5,7 @@ import { sendSMS } from '@utils/sms/sendSms';
 import { getRandomInt } from '@utils/sms/codeGenerator';
 import redisClient from '@configs/redisClient';
 import { Types } from 'mongoose';
+import bcrypt from 'bcryptjs';
 import {
     UserLoginSchema,
     UserRegisterSchema,
@@ -60,6 +61,9 @@ export async function loginController(req: Request, res: Response) {
                 .status(401)
                 .json({ error: 'Invalid phone number or password' });
         }
+        if (user.isActive == false) {
+            return res.status(409).json({ error: 'This user is Not Active!' });
+        }
 
         // Check if password matches
         const isMatch = await user.comparePassword(password);
@@ -91,6 +95,7 @@ export async function verifyController(req: Request, res: Response) {
                 .status(401)
                 .json({ error: 'phone number does not exist!' });
         }
+
         const userIdStr =
             user._id instanceof Types.ObjectId ? user._id.toString() : user._id;
 
@@ -183,7 +188,9 @@ export async function newPasswordController(req: Request, res: Response) {
         const storedOtp = await redisClient.get(userIdStr);
 
         if (storedOtp === code) {
-            await User.findByIdAndUpdate(user, { password: newPassword });
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(newPassword, salt);
+            await User.findByIdAndUpdate(user, { password: hashedPassword });
             return res.json({ message: 'Your password is Changed!' });
         } else {
             res.status(400).json({ error: 'Invalid or expired OTP' });
@@ -212,7 +219,9 @@ export async function changePasswordController(req: Request, res: Response) {
                 .json({ error: 'Your Password is Incorrect!' });
         }
 
-        await User.findByIdAndUpdate(user, { password: newPassword });
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+        await User.findByIdAndUpdate(user, { password: hashedPassword });
         return res.json({ message: 'Your password is Changed!' });
     } catch (err) {
         console.error(err);
