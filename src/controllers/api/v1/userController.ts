@@ -174,7 +174,9 @@ export async function forgetPasswordController(req: Request, res: Response) {
 export async function newPasswordController(req: Request, res: Response) {
     try {
         const { phoneNumber, code, newPassword } = req.body;
-
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+        
         // Find user by phone number
         const user = await User.findOne({ phoneNumber });
         if (!user) {
@@ -188,8 +190,6 @@ export async function newPasswordController(req: Request, res: Response) {
         const storedOtp = await redisClient.get(userIdStr);
 
         if (storedOtp === code) {
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(newPassword, salt);
             await User.findByIdAndUpdate(user, { password: hashedPassword });
             return res.json({ message: 'Your password is Changed!' });
         } else {
@@ -205,6 +205,8 @@ export async function changePasswordController(req: Request, res: Response) {
     try {
         const userId = (req.user as IUser)._id;
         const { password, newPassword } = req.body;
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
 
         const user = await User.findById({ _id: userId });
         if (!user) {
@@ -219,8 +221,6 @@ export async function changePasswordController(req: Request, res: Response) {
                 .json({ error: 'Your Password is Incorrect!' });
         }
 
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(newPassword, salt);
         await User.findByIdAndUpdate(user, { password: hashedPassword });
         return res.json({ message: 'Your password is Changed!' });
     } catch (err) {
