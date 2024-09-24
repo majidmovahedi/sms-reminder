@@ -10,6 +10,8 @@ import {
     UserLoginSchema,
     UserRegisterSchema,
 } from '@utils/validation/validationSchema';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -176,7 +178,7 @@ export async function newPasswordController(req: Request, res: Response) {
         const { phoneNumber, code, newPassword } = req.body;
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(newPassword, salt);
-        
+
         // Find user by phone number
         const user = await User.findOne({ phoneNumber });
         if (!user) {
