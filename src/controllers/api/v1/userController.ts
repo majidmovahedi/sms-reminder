@@ -12,7 +12,10 @@ import {
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
-export async function singleUser(req: express.Request, res: express.Response) {
+export async function prfileController(
+    req: express.Request,
+    res: express.Response,
+) {
     const userId = (req.user as IUser)._id;
     try {
         const user = await User.findById({ _id: userId });
@@ -25,7 +28,7 @@ export async function singleUser(req: express.Request, res: express.Response) {
     }
 }
 
-export async function register(req: Request, res: Response) {
+export async function registerController(req: Request, res: Response) {
     try {
         const { fullname, phoneNumber, password } = UserRegisterSchema.parse(
             req.body,
@@ -46,7 +49,7 @@ export async function register(req: Request, res: Response) {
     }
 }
 
-export async function login(req: Request, res: Response) {
+export async function loginController(req: Request, res: Response) {
     try {
         const { phoneNumber, password } = UserLoginSchema.parse(req.body);
 
@@ -77,7 +80,7 @@ export async function login(req: Request, res: Response) {
     }
 }
 
-export async function verify(req: Request, res: Response) {
+export async function verifyController(req: Request, res: Response) {
     try {
         const { phoneNumber, code } = req.body;
 
@@ -105,7 +108,7 @@ export async function verify(req: Request, res: Response) {
     }
 }
 
-export async function resend(req: Request, res: Response) {
+export async function resendController(req: Request, res: Response) {
     try {
         const { phoneNumber } = req.body;
 
