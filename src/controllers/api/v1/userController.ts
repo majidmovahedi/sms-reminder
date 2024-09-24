@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import User, { IUser } from '@models/userModel';
 import jwt from 'jsonwebtoken';
 import { sendSMS } from '@utils/sms/sendSms';
@@ -31,9 +31,7 @@ export async function prfileController(
 
 export async function registerController(req: Request, res: Response) {
     try {
-        const { fullname, phoneNumber, password } = UserRegisterSchema.parse(
-            req.body,
-        );
+        const { fullname, phoneNumber, password } = req.body;
         const generateCode = getRandomInt();
         const user = new User({ fullname, phoneNumber, password });
         await user.save();
@@ -52,7 +50,7 @@ export async function registerController(req: Request, res: Response) {
 
 export async function loginController(req: Request, res: Response) {
     try {
-        const { phoneNumber, password } = UserLoginSchema.parse(req.body);
+        const { phoneNumber, password } = req.body;
 
         // Find user by phone number
         const user = await User.findOne({ phoneNumber });
