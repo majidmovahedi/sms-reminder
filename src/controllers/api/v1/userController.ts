@@ -137,3 +137,33 @@ export async function resendController(req: Request, res: Response) {
         res.status(500).json({ error: 'Server error' });
     }
 }
+
+export async function forgetPasswordController(req: Request, res: Response) {
+    try {
+        const { phoneNumber } = req.body;
+
+        // Find user by phone number
+        const user = await User.findOne({ phoneNumber });
+        if (!user) {
+            return res
+                .status(401)
+                .json({ error: 'phone number does not exist!' });
+        }
+        if (user.isActive == false) {
+            return res.status(409).json({ error: 'This user is Not Active!' });
+        }
+        const generateCode = getRandomInt();
+
+        await redisClient.setEx(
+            user._id.toString(),
+            300,
+            generateCode.toString(),
+        );
+        console.log(generateCode);
+        await sendSMS(`Your Recover Code is ${generateCode}`, phoneNumber);
+        return res.status(200).json({ message: 'Code Send to Mobile' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+}
