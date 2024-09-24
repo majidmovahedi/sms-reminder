@@ -194,7 +194,31 @@ export async function newPasswordController(req: Request, res: Response) {
     }
 }
 
-// export async function changePasswordController(req: Request, res: Response) {}
+export async function changePasswordController(req: Request, res: Response) {
+    try {
+        const userId = (req.user as IUser)._id;
+        const { password, newPassword } = req.body;
+
+        const user = await User.findById({ _id: userId });
+        if (!user) {
+            return res.json('This User Does Not Exist!');
+        }
+
+        // Check if password matches
+        const isMatch = await user.comparePassword(password);
+        if (!isMatch) {
+            return res
+                .status(401)
+                .json({ error: 'Your Password is Incorrect!' });
+        }
+
+        await User.findByIdAndUpdate(user, { password: newPassword });
+        return res.json({ message: 'Your password is Changed!' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+}
 
 export async function updateProfileController(req: Request, res: Response) {
     const userId = (req.user as IUser)._id;
