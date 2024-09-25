@@ -1,4 +1,5 @@
 import {
+    adminChangePasswordController,
     adminRegisterController,
     listUsersController,
     singleUserController,
@@ -37,6 +38,12 @@ router.post(
     authMiddleware,
     adminMiddleware,
     adminRegisterController,
+);
+router.put(
+    '/change-password/:id',
+    authMiddleware,
+    adminMiddleware,
+    adminChangePasswordController,
 );
 
 export default router;
