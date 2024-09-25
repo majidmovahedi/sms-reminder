@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
 import User from '@models/userModel';
-import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
-import { string } from 'zod';
 
 export async function listUsersController(req: Request, res: Response) {
     try {
@@ -20,7 +18,6 @@ export async function singleUserController(req: Request, res: Response) {
     try {
         const { id } = req.params;
 
-        // Check if the provided ID is valid
         if (!ObjectId.isValid(id)) {
             return res.status(400).json({ error: 'Invalid user ID format.' });
         }
@@ -30,8 +27,29 @@ export async function singleUserController(req: Request, res: Response) {
         if (!user) {
             return res.json('This User Does Not Exist!');
         }
+
         return res.status(200).json(user);
     } catch (err) {
         console.error('Error finding user by ID:', err);
+    }
+}
+
+export async function adminRegisterController(req: Request, res: Response) {
+    try {
+        const { fullname, phoneNumber, password, isActive, adminType } =
+            req.body;
+
+        const user = new User({
+            fullname,
+            phoneNumber,
+            password,
+            isActive,
+            adminType,
+        });
+        await user.save();
+
+        return res.status(201).json({ message: 'User registered', user });
+    } catch (error) {
+        return res.status(400).json(error);
     }
 }
