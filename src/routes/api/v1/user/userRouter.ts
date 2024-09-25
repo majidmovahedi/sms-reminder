@@ -8,6 +8,7 @@ import {
     newPasswordController,
     updateProfileController,
     changePasswordController,
+    deleteProfileController,
 } from '@controllers/api/v1/userController';
 import { authMiddleware } from '@middlewares/authMiddleware';
 import { validate } from '@utils/validation/validate';
@@ -52,5 +53,6 @@ router.put(
     validate(UserUpdateProfileSchema),
     updateProfileController,
 );
+router.delete('/delete', authMiddleware, deleteProfileController);
 
 export default router;

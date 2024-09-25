@@ -6,10 +6,6 @@ import { getRandomInt } from '@utils/sms/codeGenerator';
 import redisClient from '@configs/redisClient';
 import { Types } from 'mongoose';
 import bcrypt from 'bcryptjs';
-import {
-    UserLoginSchema,
-    UserRegisterSchema,
-} from '@utils/validation/validationSchema';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -240,5 +236,15 @@ export async function updateProfileController(req: Request, res: Response) {
         return res.status(200).json('Your Name Changed Succesfully!');
     } catch (err) {
         console.error('Error During Update User Profile ', err);
+    }
+}
+
+export async function deleteProfileController(req: Request, res: Response) {
+    const userId = (req.user as IUser)._id;
+    try {
+        await User.findOneAndDelete({ _id: userId });
+        return res.status(200).json('User Deleted Succesfully!');
+    } catch (err) {
+        console.error('Error During Delete User ', err);
     }
 }
