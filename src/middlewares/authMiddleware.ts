@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import passport from '@middlewares/passport';
-import { IUser } from '@models/userModel';
+import User, { IUser } from '@models/userModel';
 
-// Middleware to protect routes
 export const authMiddleware = (
     req: Request,
     res: Response,
@@ -20,3 +19,22 @@ export const authMiddleware = (
         },
     )(req, res, next);
 };
+
+export async function adminMiddleware(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) {
+    const userId = (req.user as IUser)._id;
+
+    try {
+        const user = await User.findById({ _id: userId });
+        if (user?.adminType == true) {
+            next();
+        } else {
+            res.status(401).json('You Dont Have Permission!');
+        }
+    } catch (err) {
+        console.error('Error during adminType:', err);
+    }
+}
