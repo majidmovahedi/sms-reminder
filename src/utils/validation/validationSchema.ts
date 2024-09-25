@@ -23,7 +23,7 @@ export const UserVerifySchema = z.object({
         .min(11, 'phoneNumber must be at least 11 characters')
         .max(11, 'phoneNumber must not exceed 11 characters'),
     code: z
-        .number()
+        .string()
         .min(5, 'code must be at least 5 numbers')
         .max(5, 'code must not exceed 5 numbers'),
 });
@@ -48,7 +48,7 @@ export const UserNewPasswordSchema = z.object({
         .min(11, 'phoneNumber must be at least 11 characters')
         .max(11, 'phoneNumber must not exceed 11 characters'),
     code: z
-        .number()
+        .string()
         .min(5, 'code must be at least 5 numbers')
         .max(5, 'code must not exceed 5 numbers'),
     newPassword: z
