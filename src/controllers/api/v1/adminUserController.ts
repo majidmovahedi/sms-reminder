@@ -83,3 +83,33 @@ export async function adminChangePasswordController(
         res.status(500).json({ error: 'Server error' });
     }
 }
+
+export async function adminUpdateProfileController(
+    req: Request,
+    res: Response,
+) {
+    try {
+        const { id } = req.params;
+        const { fullname, phoneNumber, isActive, adminType } = req.body;
+
+        if (!ObjectId.isValid(id)) {
+            return res.status(400).json({ error: 'Invalid user ID format.' });
+        }
+        // Find user by ID
+        const user = await User.findById({ _id: new ObjectId(id) });
+
+        if (!user) {
+            return res.json('This User Does Not Exist!');
+        }
+
+        await User.findByIdAndUpdate(user, {
+            fullname,
+            phoneNumber,
+            isActive,
+            adminType,
+        });
+        return res.status(200).json('Profile Changed Succesfully!');
+    } catch (err) {
+        console.error('Error During Update User Profile ', err);
+    }
+}

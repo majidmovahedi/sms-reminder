@@ -1,6 +1,7 @@
 import {
     adminChangePasswordController,
     adminRegisterController,
+    adminUpdateProfileController,
     listUsersController,
     singleUserController,
 } from '@controllers/api/v1/adminUserController';
@@ -45,5 +46,12 @@ router.put(
     adminMiddleware,
     adminChangePasswordController,
 );
+router.put(
+    '/update/:id',
+    authMiddleware,
+    adminMiddleware,
+    adminUpdateProfileController,
+);
+// router.delete('/delete/:id', authMiddleware, adminMiddleware, adminDeleteProfileController);
 
 export default router;
