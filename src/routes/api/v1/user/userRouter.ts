@@ -20,7 +20,7 @@ import {
     UserResendSchema,
     UserUpdateProfileSchema,
     UserVerifySchema,
-} from '@utils/validation/validationSchema';
+} from '@utils/validation/userValidationSchema';
 import { Router } from 'express';
 
 const router = Router();
