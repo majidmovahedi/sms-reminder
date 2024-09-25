@@ -1,5 +1,6 @@
 import {
     adminChangePasswordController,
+    adminDeleteProfileController,
     adminRegisterController,
     adminUpdateProfileController,
     listUsersController,
@@ -52,6 +53,11 @@ router.put(
     adminMiddleware,
     adminUpdateProfileController,
 );
-// router.delete('/delete/:id', authMiddleware, adminMiddleware, adminDeleteProfileController);
+router.delete(
+    '/delete/:id',
+    authMiddleware,
+    adminMiddleware,
+    adminDeleteProfileController,
+);
 
 export default router;

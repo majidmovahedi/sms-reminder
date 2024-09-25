@@ -113,3 +113,30 @@ export async function adminUpdateProfileController(
         console.error('Error During Update User Profile ', err);
     }
 }
+
+export async function adminDeleteProfileController(
+    req: Request,
+    res: Response,
+) {
+    try {
+        const { id } = req.params;
+
+        if (!ObjectId.isValid(id)) {
+            return res.status(400).json({ error: 'Invalid user ID format.' });
+        }
+        // Find user by ID
+        const user = await User.findById({ _id: new ObjectId(id) });
+
+        if (!user) {
+            return res.json('This User Does Not Exist!');
+        }
+
+        await User.findOneAndDelete({ _id: user });
+
+        //Delete User's Reminder and Transactions and etc..
+
+        return res.status(200).json('User Deleted Succesfully!');
+    } catch (err) {
+        console.error('Error During Delete User ', err);
+    }
+}
