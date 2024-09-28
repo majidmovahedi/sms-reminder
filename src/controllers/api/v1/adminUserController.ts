@@ -40,6 +40,11 @@ export async function adminRegisterController(req: Request, res: Response) {
         const { fullname, phoneNumber, password, isActive, adminType } =
             req.body;
 
+        const findUser = await User.findOne({ phoneNumber: phoneNumber });
+        if (findUser) {
+            return res.json('This PhoneNumber Exist!');
+        }
+
         const user = new User({
             fullname,
             phoneNumber,
@@ -98,6 +103,9 @@ export async function adminUpdateProfileController(
         // Find user by ID
         const user = await User.findById({ _id: new ObjectId(id) });
 
+        if (user?.phoneNumber == phoneNumber) {
+            return res.json('This PhoneNumber is Exist!');
+        }
         if (!user) {
             return res.json('This User Does Not Exist!');
         }

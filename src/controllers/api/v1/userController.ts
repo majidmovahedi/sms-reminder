@@ -29,6 +29,12 @@ export async function registerController(req: Request, res: Response) {
     try {
         const { fullname, phoneNumber, password } = req.body;
         const generateCode = getRandomInt();
+
+        const findUser = await User.findOne({ phoneNumber: phoneNumber });
+        if (findUser) {
+            return res.json('This PhoneNumber Exist!');
+        }
+
         const user = new User({ fullname, phoneNumber, password });
         await user.save();
 
