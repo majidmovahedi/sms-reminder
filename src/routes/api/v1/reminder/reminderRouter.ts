@@ -1,5 +1,6 @@
 import {
     createReminderController,
+    deleteReminderController,
     remindersController,
     singleReminderController,
     updateReminderController,
@@ -15,5 +16,6 @@ router.get('/:id', singleReminderController);
 router.get('/', remindersController);
 router.post('/', createReminderController);
 router.put('/:id', updateReminderController);
+router.delete('/:id', deleteReminderController);
 
 export default router;
