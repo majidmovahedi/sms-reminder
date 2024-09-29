@@ -3,7 +3,10 @@ import mongoose, { Document, Schema } from 'mongoose';
 interface IReminder extends Document {
     title: string;
     reminderText: string;
-    reminderDate: Date;
+    month: number;
+    day: number;
+    hour: number;
+    minute: number;
     userId: mongoose.Types.ObjectId;
 }
 
@@ -16,10 +19,10 @@ const ReminderSchema: Schema<IReminder> = new Schema({
         type: String,
         required: true,
     },
-    reminderDate: {
-        type: Date,
-        required: true,
-    },
+    month: { type: Number, required: true },
+    day: { type: Number, required: true },
+    hour: { type: Number, required: true },
+    minute: { type: Number, required: true },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
