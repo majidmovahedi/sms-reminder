@@ -5,12 +5,12 @@ import {
     adminUpdateProfileController,
     listUsersController,
     singleUserController,
-} from '@controllers/api/v1/adminUserController';
+} from '@controllers/api/v1/user/adminUserController';
 import {
     forgetPasswordController,
     loginController,
     newPasswordController,
-} from '@controllers/api/v1/userController';
+} from '@controllers/api/v1/user/userController';
 import { adminMiddleware } from '@middlewares/authMiddleware';
 import { authMiddleware } from '@middlewares/authMiddleware';
 import {

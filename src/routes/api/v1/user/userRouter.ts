@@ -9,7 +9,7 @@ import {
     updateProfileController,
     changePasswordController,
     deleteProfileController,
-} from '@controllers/api/v1/userController';
+} from '@controllers/api/v1/user/userController';
 import { authMiddleware } from '@middlewares/authMiddleware';
 import { validate } from '@utils/validation/validate';
 import {
