@@ -87,3 +87,26 @@ export async function updatePlanController(req: Request, res: Response) {
         return res.status(500).json({ message: 'Server error occurred' });
     }
 }
+
+export async function deletePlanController(req: Request, res: Response) {
+    try {
+        const { id } = req.params;
+
+        if (!ObjectId.isValid(id)) {
+            return res.status(400).json({ error: 'Invalid Plan ID format.' });
+        }
+
+        const plan = await Plan.findById(id);
+
+        if (!plan) {
+            return res.status(404).json({ error: 'Plan not found.' });
+        }
+
+        await Plan.deleteOne({ _id: plan.id });
+
+        return res.status(200).json('Plan Deleted Succesfully!');
+    } catch (err) {
+        console.error('Error During Delete Plan:', err);
+        return res.status(500).json({ message: 'Server error occurred' });
+    }
+}

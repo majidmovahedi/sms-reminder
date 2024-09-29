@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authMiddleware, adminMiddleware } from '@middlewares/authMiddleware';
 import {
     createPlanController,
+    deletePlanController,
     plansController,
     singlePlanController,
     updatePlanController,
@@ -15,6 +16,6 @@ router.get('/:id', singlePlanController);
 router.get('/', plansController);
 router.post('/', createPlanController);
 router.put('/:id', updatePlanController);
-// router.delete('/:id', deleteReminderController);
+router.delete('/:id', deletePlanController);
 
 export default router;
