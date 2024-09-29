@@ -32,6 +32,7 @@
     "paths": {
       "@configs/*": ["configs/*"],
       "@controllers/*": ["controllers/*"],
+      "@jobs/*": ["jobs/*"],
       "@middlewares/*": ["middlewares/*"],
       "@models/*": ["models/*"],
       "@routes/*": ["routes/*"],

@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import apiVersionRouter from "@routes/api/apiVersionRouter";
 import passport from "passport";
+import { reminderJob } from "@jobs/reminderJob";
 
 dotenv.config();
 const port = process.env.PORT;
@@ -23,3 +24,5 @@ mongoose
 app.listen(port, () => {
   console.log(`Listening On Port ${port}`);
 });
+
+reminderJob.start();

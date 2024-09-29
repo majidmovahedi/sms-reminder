@@ -42,11 +42,9 @@ export async function singleReminderController(req: Request, res: Response) {
                 .json({ message: 'You Dont have any reminders!' });
         }
         if (reminder.userId.toString() !== userId.toString()) {
-            return res
-                .status(403)
-                .json({
-                    error: 'You are not authorized to get this reminder.',
-                });
+            return res.status(403).json({
+                error: 'You are not authorized to get this reminder.',
+            });
         }
 
         return res.status(200).json(reminder);
@@ -97,11 +95,9 @@ export async function updateReminderController(req: Request, res: Response) {
         }
 
         if (reminder.userId.toString() !== userId.toString()) {
-            return res
-                .status(403)
-                .json({
-                    error: 'You are not authorized to update this reminder.',
-                });
+            return res.status(403).json({
+                error: 'You are not authorized to update this reminder.',
+            });
         }
 
         await Reminder.findByIdAndUpdate(id, {
@@ -137,11 +133,9 @@ export async function deleteReminderController(req: Request, res: Response) {
             return res.status(404).json({ error: 'Reminder not found.' });
         }
         if (reminder.userId.toString() !== userId.toString()) {
-            return res
-                .status(403)
-                .json({
-                    error: 'You are not authorized to delete this reminder.',
-                });
+            return res.status(403).json({
+                error: 'You are not authorized to delete this reminder.',
+            });
         }
 
         await Reminder.deleteOne({ _id: reminder.id });
