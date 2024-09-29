@@ -40,3 +40,21 @@ export async function singlePlanController(req: Request, res: Response) {
         return res.status(500).json({ message: 'Server error occurred' });
     }
 }
+
+export async function createPlanController(req: Request, res: Response) {
+    try {
+        const { planName, description, smsCount, price } = req.body;
+
+        const newPlan = new Plan({
+            planName,
+            description,
+            smsCount,
+            price,
+        });
+        await newPlan.save();
+        return res.status(201).json({ message: 'Plan Created', newPlan });
+    } catch (err) {
+        console.error('Error During Create Plan:', err);
+        return res.status(500).json({ message: 'Server error occurred' });
+    }
+}
