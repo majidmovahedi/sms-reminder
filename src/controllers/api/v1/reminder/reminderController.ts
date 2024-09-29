@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { IUser } from '@models/userModel';
 import Reminder from '@models/reminderModel';
 import { ObjectId } from 'mongodb';

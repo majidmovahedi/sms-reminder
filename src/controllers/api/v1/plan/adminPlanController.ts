@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import { Request, Response } from 'express';
 import Plan from '@models/planModel';
 import { ObjectId } from 'mongodb';
 
@@ -7,9 +7,7 @@ export async function plansController(req: Request, res: Response) {
         const plans = await Plan.find();
 
         if (plans.length === 0) {
-            return res
-                .status(404)
-                .json({ message: 'You Dont Create any Plan!' });
+            return res.status(404).json({ message: 'Plan Does Not Exist!' });
         }
 
         return res.status(200).json(plans);
@@ -29,9 +27,7 @@ export async function singlePlanController(req: Request, res: Response) {
         const plan = await Plan.findOne({ _id: new ObjectId(id) });
 
         if (!plan) {
-            return res
-                .status(404)
-                .json({ message: 'This Plan Does Not Exist!' });
+            return res.status(404).json({ message: 'Plan Does Not Exist!' });
         }
 
         return res.status(200).json(plan);
