@@ -46,3 +46,25 @@ export async function singleReminderController(req: Request, res: Response) {
         return res.status(500).json({ message: 'Server error occurred' });
     }
 }
+
+export async function createReminderController(req: Request, res: Response) {
+    const userId = (req.user as IUser)._id;
+    try {
+        const { title, reminderText, month, day, hour, minute } = req.body;
+
+        const reminder = new Reminder({
+            title,
+            reminderText,
+            month,
+            day,
+            hour,
+            minute,
+            userId,
+        });
+        await reminder.save();
+        return res.status(201).json({ message: 'Reminder Created', reminder });
+    } catch (err) {
+        console.error('Error During Create Reminder:', err);
+        return res.status(500).json({ message: 'Server error occurred' });
+    }
+}

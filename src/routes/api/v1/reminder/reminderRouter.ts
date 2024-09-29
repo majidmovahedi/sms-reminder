@@ -1,4 +1,5 @@
 import {
+    createReminderController,
     remindersController,
     singleReminderController,
 } from '@controllers/api/v1/reminder/reminderController';
@@ -11,5 +12,6 @@ router.use(authMiddleware);
 
 router.get('/', remindersController);
 router.get('/:id', singleReminderController);
+router.post('/', createReminderController);
 
 export default router;
