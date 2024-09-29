@@ -27,7 +27,9 @@ export async function singleReminderController(req: Request, res: Response) {
         const { id } = req.params;
 
         if (!ObjectId.isValid(id)) {
-            return res.status(400).json({ error: 'Invalid user ID format.' });
+            return res
+                .status(400)
+                .json({ error: 'Invalid Reminder ID format.' });
         }
         const reminder = await Reminder.findOne({
             _id: new ObjectId(id),
@@ -65,6 +67,34 @@ export async function createReminderController(req: Request, res: Response) {
         return res.status(201).json({ message: 'Reminder Created', reminder });
     } catch (err) {
         console.error('Error During Create Reminder:', err);
+        return res.status(500).json({ message: 'Server error occurred' });
+    }
+}
+
+export async function updateReminderController(req: Request, res: Response) {
+    const userId = (req.user as IUser)._id;
+    try {
+        const { id } = req.params;
+        const { title, reminderText, month, day, hour, minute } = req.body;
+
+        if (!ObjectId.isValid(id)) {
+            return res
+                .status(400)
+                .json({ error: 'Invalid Reminder ID format.' });
+        }
+
+        await Reminder.findByIdAndUpdate(id, {
+            title,
+            reminderText,
+            month,
+            day,
+            hour,
+            minute,
+        });
+
+        return res.status(200).json({ message: 'Reminder Updated' });
+    } catch (err) {
+        console.error('Error During Update Reminder:', err);
         return res.status(500).json({ message: 'Server error occurred' });
     }
 }
