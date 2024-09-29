@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
+import { IUser } from './userModel';
 
 interface IReminder extends Document {
     title: string;
@@ -7,7 +8,8 @@ interface IReminder extends Document {
     day: number;
     hour: number;
     minute: number;
-    userId: mongoose.Types.ObjectId;
+    // userId: mongoose.Types.ObjectId;
+    userId: IUser;
 }
 
 const ReminderSchema: Schema<IReminder> = new Schema({

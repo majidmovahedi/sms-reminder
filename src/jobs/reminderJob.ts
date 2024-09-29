@@ -23,7 +23,8 @@ export const reminderJob = cron.schedule(
         // Send SMS Reminder
         reminders.forEach((reminder) => {
             const message = `${reminder.title} \n ${reminder.reminderText}`;
-            // sendSMS(message, reminder.userId.phoneNumber );
+            const phoneNumber = reminder.userId.phoneNumber;
+            sendSMS(message, phoneNumber);
         });
     },
     {
