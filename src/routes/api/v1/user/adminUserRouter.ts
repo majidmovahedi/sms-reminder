@@ -13,6 +13,7 @@ import {
 } from '@controllers/api/v1/user/userController';
 import { adminMiddleware } from '@middlewares/authMiddleware';
 import { authMiddleware } from '@middlewares/authMiddleware';
+import { AdminUserRegisterSchema } from '@utils/validation/adminUserValidationSchema';
 import {
     UserForgetPasswordSchema,
     UserNewPasswordSchema,
@@ -37,6 +38,7 @@ router.put(
 );
 router.post(
     '/register',
+    validate(AdminUserRegisterSchema),
     authMiddleware,
     adminMiddleware,
     adminRegisterController,
