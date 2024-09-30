@@ -13,9 +13,14 @@ import {
 } from '@controllers/api/v1/user/userController';
 import { adminMiddleware } from '@middlewares/authMiddleware';
 import { authMiddleware } from '@middlewares/authMiddleware';
-import { AdminUserRegisterSchema } from '@utils/validation/adminUserValidationSchema';
+import {
+    AdminUserChangePasswordSchema,
+    AdminUserRegisterSchema,
+    AdminUserUpdateProfileSchema,
+} from '@utils/validation/adminUserValidationSchema';
 import {
     UserForgetPasswordSchema,
+    UserLoginSchema,
     UserNewPasswordSchema,
 } from '@utils/validation/userValidationSchema';
 import { validate } from '@utils/validation/validate';
@@ -25,7 +30,7 @@ const router = Router();
 
 router.get('/', authMiddleware, adminMiddleware, listUsersController);
 router.get('/:id', authMiddleware, adminMiddleware, singleUserController);
-router.post('/login', loginController);
+router.post('/login', validate(UserLoginSchema), loginController);
 router.post(
     '/forget-password',
     validate(UserForgetPasswordSchema),
@@ -45,12 +50,14 @@ router.post(
 );
 router.put(
     '/change-password/:id',
+    validate(AdminUserChangePasswordSchema),
     authMiddleware,
     adminMiddleware,
     adminChangePasswordController,
 );
 router.put(
     '/update/:id',
+    validate(AdminUserUpdateProfileSchema),
     authMiddleware,
     adminMiddleware,
     adminUpdateProfileController,
