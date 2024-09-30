@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-// title, reminderText, month, day, hour, minute
-
 export const CreateReminderSchema = z.object({
     title: z.string().min(3, 'title must be at least 3 characters'),
     reminderText: z
