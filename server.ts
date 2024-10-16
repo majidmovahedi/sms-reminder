@@ -18,7 +18,7 @@ app.use(passport.initialize());
 app.use("/api", apiVersionRouter);
 
 mongoose
-  .connect("mongodb://localhost:27017/mydatabase")
+  .connect("mongodb://mongo:27017/mydatabase")
   .then(() => console.log("MongoDB Connected!"));
 
 app.listen(port, () => {
