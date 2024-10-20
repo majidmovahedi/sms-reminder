@@ -6,8 +6,12 @@ import { getRandomInt } from '@utils/sms/codeGenerator';
 import redisClient from '@configs/redisClient';
 import { Types } from 'mongoose';
 import bcrypt from 'bcryptjs';
+import axios from 'axios';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const ZIBAL_API_URL = process.env.ZIBAL_API_URL as string;
+const ZIBAL_VERIFY_URL = process.env.ZIBAL_VERIFY_URL as string;
+const MERCHANT_ID = process.env.MERCHANT_ID as string;
 
 export async function prfileController(
     req: express.Request,
@@ -252,5 +256,68 @@ export async function deleteProfileController(req: Request, res: Response) {
         return res.status(200).json('User Deleted Succesfully!');
     } catch (err) {
         console.error('Error During Delete User ', err);
+    }
+}
+
+export async function paymentController(req: Request, res: Response) {
+    const userId = (req.user as IUser)._id;
+    const { amount, callbackUrl, PhoneNumber } = req.body;
+
+    try {
+        const response = await axios.post(ZIBAL_API_URL, {
+            merchant: MERCHANT_ID,
+            amount: amount,
+            callbackUrl: callbackUrl,
+            mobile: PhoneNumber,
+        });
+
+        if (response.data.result === 100) {
+            res.json({
+                success: true,
+                paymentUrl: `https://gateway.zibal.ir/start/${response.data.trackId}`,
+            });
+        } else {
+            res.status(400).json({
+                success: false,
+                message: response.data.message,
+            });
+        }
+    } catch (error) {
+        console.error('Error During Payment ', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error During Payment...',
+        });
+    }
+}
+
+export async function verifyPaymentController(req: Request, res: Response) {
+    const userId = (req.user as IUser)._id;
+    const { trackId } = req.body;
+
+    try {
+        const response = await axios.post(ZIBAL_VERIFY_URL, {
+            merchant: MERCHANT_ID,
+            trackId: trackId,
+        });
+
+        if (response.data.result === 100) {
+            res.json({
+                success: true,
+                message: 'Success Transaction',
+                data: response.data,
+            });
+        } else {
+            res.status(400).json({
+                success: false,
+                message: 'UnSuccess Transaction',
+            });
+        }
+    } catch (error) {
+        console.error('Error During Verify Payment ', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error during Verify payment ...',
+        });
     }
 }

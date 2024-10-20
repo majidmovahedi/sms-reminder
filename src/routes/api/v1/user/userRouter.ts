@@ -9,6 +9,8 @@ import {
     updateProfileController,
     changePasswordController,
     deleteProfileController,
+    paymentController,
+    verifyPaymentController,
 } from '@controllers/api/v1/user/userController';
 import { authMiddleware } from '@middlewares/authMiddleware';
 import { validate } from '@utils/validation/validate';
@@ -54,5 +56,10 @@ router.put(
     updateProfileController,
 );
 router.delete('/delete', authMiddleware, deleteProfileController);
+
+// Payment
+
+router.post('/pay', authMiddleware, paymentController);
+router.post('/pay/verify', authMiddleware, verifyPaymentController);
 
 export default router;
