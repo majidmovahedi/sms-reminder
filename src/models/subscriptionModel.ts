@@ -1,10 +1,16 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+export enum StatusEnum {
+    Expired = 'Expired',
+    Pending = 'Pending',
+    Active = 'Active',
+}
+
 interface ISubscription extends Document {
     smsCount: number;
     userId: mongoose.Types.ObjectId;
     // planId: mongoose.Types.ObjectId;
-    status: string;
+    status: StatusEnum;
 }
 
 const SubscriptionSchema: Schema<ISubscription> = new Schema({

@@ -7,6 +7,8 @@ import redisClient from '@configs/redisClient';
 import { Types } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import axios from 'axios';
+import Payment from '@models/paymentModel';
+import Subscription, { StatusEnum } from '@models/subscriptionModel';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const ZIBAL_API_URL = process.env.ZIBAL_API_URL as string;
@@ -276,11 +278,27 @@ export async function paymentController(req: Request, res: Response) {
                 success: true,
                 paymentUrl: `https://gateway.zibal.ir/start/${response.data.trackId}`,
             });
+            const payment = new Payment({
+                paymentDate: Date.now(),
+                paymentMethod: 'Zibal',
+                amount: amount,
+                userId,
+                status: true,
+            });
+            await payment.save();
         } else {
             res.status(400).json({
                 success: false,
                 message: response.data.message,
             });
+            const payment = new Payment({
+                paymentDate: Date.now(),
+                paymentMethod: 'Zibal',
+                amount: amount,
+                userId,
+                status: false,
+            });
+            await payment.save();
         }
     } catch (error) {
         console.error('Error During Payment ', error);
@@ -307,11 +325,24 @@ export async function verifyPaymentController(req: Request, res: Response) {
                 message: 'Success Transaction',
                 data: response.data,
             });
+
+            const sub = new Subscription({
+                smsCount: 20,
+                userId,
+                status: StatusEnum.Active,
+            });
+            await sub.save();
         } else {
             res.status(400).json({
                 success: false,
                 message: 'UnSuccess Transaction',
             });
+            const sub = new Subscription({
+                smsCount: 20,
+                userId,
+                status: StatusEnum.Pending,
+            });
+            await sub.save();
         }
     } catch (error) {
         console.error('Error During Verify Payment ', error);

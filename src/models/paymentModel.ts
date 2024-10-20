@@ -5,7 +5,6 @@ interface IPayment extends Document {
     paymentMethod: string;
     amount: number;
     userId: mongoose.Types.ObjectId;
-    subscriptionId: mongoose.Types.ObjectId;
     status: boolean;
 }
 
@@ -25,11 +24,6 @@ const PaymentSchema: Schema<IPayment> = new Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true,
-    },
-    subscriptionId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Subscription',
         required: true,
     },
     status: {
