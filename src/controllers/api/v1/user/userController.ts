@@ -9,11 +9,13 @@ import bcrypt from 'bcryptjs';
 import axios from 'axios';
 import Payment from '@models/paymentModel';
 import Subscription, { StatusEnum } from '@models/subscriptionModel';
+import Plan from '@models/planModel';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const ZIBAL_API_URL = process.env.ZIBAL_API_URL as string;
 const ZIBAL_VERIFY_URL = process.env.ZIBAL_VERIFY_URL as string;
 const MERCHANT_ID = process.env.MERCHANT_ID as string;
+const ZIBAL_CALLBACK_URL = process.env.ZIBAL_CALLBACK_URL as string;
 
 export async function prfileController(
     req: express.Request,
@@ -263,92 +265,111 @@ export async function deleteProfileController(req: Request, res: Response) {
 
 export async function paymentController(req: Request, res: Response) {
     const userId = (req.user as IUser)._id;
-    const { amount, callbackUrl, PhoneNumber } = req.body;
+    const { planId, phoneNumber } = req.body;
 
     try {
-        const response = await axios.post(ZIBAL_API_URL, {
-            merchant: MERCHANT_ID,
-            amount: amount,
-            callbackUrl: callbackUrl,
-            mobile: PhoneNumber,
+        const plan = await Plan.findById(planId);
+        if (!plan) {
+            return res.status(404).json({ message: 'Plan not found' });
+        }
+        const subscription = new Subscription({
+            smsCount: plan.smsCount,
+            userId: userId,
+            planId: plan._id,
+            status: StatusEnum.Pending,
         });
+        await subscription.save();
 
-        if (response.data.result === 100) {
-            res.json({
-                success: true,
-                paymentUrl: `https://gateway.zibal.ir/start/${response.data.trackId}`,
-            });
-            const payment = new Payment({
-                paymentDate: Date.now(),
-                paymentMethod: 'Zibal',
+        const amount = plan.price;
+        const callbackUrl = `${ZIBAL_CALLBACK_URL}?subscriptionId=${subscription._id}`;
+
+        try {
+            const response = await axios.post(ZIBAL_API_URL, {
+                merchant: MERCHANT_ID,
                 amount: amount,
-                userId,
-                status: true,
+                callbackUrl: callbackUrl,
+                mobile: phoneNumber,
             });
-            await payment.save();
-        } else {
-            res.status(400).json({
-                success: false,
-                message: response.data.message,
+
+            const { trackId, result } = response.data;
+
+            if (result !== 100) {
+                return res
+                    .status(400)
+                    .json({ message: 'Failed to initiate payment' });
+            }
+
+            return res.status(200).json({
+                message: 'Payment initiated',
+                subscriptionId: subscription._id,
+                paymentUrl: `https://gateway.zibal.ir/start/${trackId}`,
             });
-            const payment = new Payment({
-                paymentDate: Date.now(),
-                paymentMethod: 'Zibal',
-                amount: amount,
-                userId,
-                status: false,
-            });
-            await payment.save();
+        } catch (error) {
+            console.error('Error connecting to Zibal:', error);
+            return res
+                .status(500)
+                .json({ message: 'Error initiating payment' });
         }
     } catch (error) {
-        console.error('Error During Payment ', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error During Payment...',
-        });
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
     }
 }
 
 export async function verifyPaymentController(req: Request, res: Response) {
     const userId = (req.user as IUser)._id;
-    const { trackId } = req.body;
-
     try {
-        const response = await axios.post(ZIBAL_VERIFY_URL, {
-            merchant: MERCHANT_ID,
-            trackId: trackId,
-        });
+        const { subscriptionId, trackId } = req.body;
 
-        if (response.data.result === 100) {
-            res.json({
-                success: true,
-                message: 'Success Transaction',
-                data: response.data,
+        const subscription = await Subscription.findById(subscriptionId);
+        if (!subscription) {
+            return res.status(404).json({ message: 'Subscription not found' });
+        }
+        try {
+            const response = await axios.post(ZIBAL_VERIFY_URL, {
+                merchant: MERCHANT_ID,
+                trackId: trackId,
             });
 
-            const sub = new Subscription({
-                smsCount: 20,
-                userId,
-                status: StatusEnum.Active,
-            });
-            await sub.save();
-        } else {
-            res.status(400).json({
-                success: false,
-                message: 'UnSuccess Transaction',
-            });
-            const sub = new Subscription({
-                smsCount: 20,
-                userId,
-                status: StatusEnum.Pending,
-            });
-            await sub.save();
+            const { result, amount, paidAt } = response.data;
+
+            if (result === 100) {
+                subscription.status = StatusEnum.Active;
+                await subscription.save();
+
+                const payment = new Payment({
+                    paymentDate: new Date(paidAt),
+                    paymentMethod: 'Zibal',
+                    amount: amount,
+                    userId: subscription.userId,
+                    status: true,
+                });
+                await payment.save();
+
+                return res.status(200).json({
+                    message: 'Payment verified and subscription activated',
+                });
+            } else {
+                subscription.status = StatusEnum.Failed;
+                await subscription.save();
+
+                const payment = new Payment({
+                    paymentDate: new Date(),
+                    paymentMethod: 'Zibal',
+                    amount: amount,
+                    userId: subscription.userId,
+                    status: false,
+                });
+                await payment.save();
+
+                return res.status(400).json({ message: 'Payment failed' });
+            }
+        } catch (error) {
+            console.error('Error verifying payment with Zibal:', error);
+            return res.status(500).json({ message: 'Error verifying payment' });
         }
     } catch (error) {
-        console.error('Error During Verify Payment ', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error during Verify payment ...',
-        });
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
     }
 }
