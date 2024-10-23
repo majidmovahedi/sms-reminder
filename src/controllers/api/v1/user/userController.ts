@@ -10,6 +10,7 @@ import axios from 'axios';
 import Payment from '@models/paymentModel';
 import Subscription, { StatusEnum } from '@models/subscriptionModel';
 import Plan from '@models/planModel';
+import Reminder from '@models/reminderModel';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const ZIBAL_API_URL = process.env.ZIBAL_API_URL as string;
@@ -257,6 +258,9 @@ export async function deleteProfileController(req: Request, res: Response) {
     const userId = (req.user as IUser)._id;
     try {
         await User.findOneAndDelete({ _id: userId });
+        await Subscription.deleteMany({ userId: userId }); // Delete all subscriptions for the user
+        await Reminder.deleteMany({ userId: userId }); // Delete all reminders for the user
+        await Payment.deleteMany({ userId: userId }); // Delete all payments for the user
         return res.status(200).json('User Deleted Succesfully!');
     } catch (err) {
         console.error('Error During Delete User ', err);

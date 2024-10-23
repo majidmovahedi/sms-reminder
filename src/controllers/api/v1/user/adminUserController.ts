@@ -2,6 +2,9 @@ import { Request, Response } from 'express';
 import User from '@models/userModel';
 import { ObjectId } from 'mongodb';
 import bcrypt from 'bcryptjs';
+import Subscription from '@models/subscriptionModel';
+import Reminder from '@models/reminderModel';
+import Payment from '@models/paymentModel';
 
 export async function listUsersController(req: Request, res: Response) {
     try {
@@ -139,9 +142,12 @@ export async function adminDeleteProfileController(
             return res.json('This User Does Not Exist!');
         }
 
+        // Delete User
         await User.findOneAndDelete({ _id: user });
 
-        //Delete User's Reminder and Transactions and etc..
+        await Subscription.deleteMany({ userId: user._id }); // Delete all subscriptions for the user
+        await Reminder.deleteMany({ userId: user._id }); // Delete all reminders for the user
+        await Payment.deleteMany({ userId: user._id }); // Delete all payments for the user
 
         return res.status(200).json('User Deleted Succesfully!');
     } catch (err) {
