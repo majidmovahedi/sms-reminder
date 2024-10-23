@@ -334,8 +334,24 @@ export async function verifyPaymentController(req: Request, res: Response) {
             const { result, amount, paidAt } = response.data;
 
             if (result === 100) {
-                subscription.status = StatusEnum.Active;
-                await subscription.save();
+                const existingSubscription = await Subscription.findOne({
+                    userId: subscription.userId,
+                    status: StatusEnum.Active,
+                });
+
+                if (existingSubscription) {
+                    existingSubscription.smsCount += subscription.smsCount;
+                    await existingSubscription.save();
+                    await Subscription.findByIdAndDelete(subscriptionId);
+                } else {
+                    subscription.status = StatusEnum.Active;
+                    await subscription.save();
+                }
+
+                await Subscription.deleteMany({
+                    userId: subscription.userId,
+                    status: { $in: [StatusEnum.Pending, StatusEnum.Failed] },
+                });
 
                 const payment = new Payment({
                     paymentDate: new Date(paidAt),
