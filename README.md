@@ -6,13 +6,18 @@ This project is a **Birthday SMS Reminder System** that allows users to register
 
 ### Features:
 
-- Register and manage birthdays
-- Send reminder SMS to users via **sms.ir**
-- Manage user subscriptions using **Passport.js**
-- Secure payment gateway via **Zarinpal**
-- **MongoDB** database for storing user and birthday information
+- **Register and manage birthdays**
+- **Send reminder SMS** to users via [sms.ir](https://www.sms.ir)
+- **Manage user subscriptions** using [Passport.js](https://www.passportjs.org)
+- **Secure payment gateway** via [Zibal](https://www.zibal.ir)
+- **MongoDB database** for storing user and birthday information
 - Built with **TypeScript** for a safe and scalable codebase
 - Powered by **Express.js** as the main server framework
+- **OTP authentication** using [Redis](https://redis.io) to send one-time passwords
+- **JWT** for handling token-based authentication and session management
+- **Password hashing and recovery** using [bcrypt](https://www.npmjs.com/package/bcrypt)
+- **Data validation** with [Zod](https://zod.dev)
+- **Scheduled SMS reminders** using [CronJob](https://www.npmjs.com/package/node-cron)
 
 ## Technologies & Tools
 
@@ -23,7 +28,12 @@ This project is a **Birthday SMS Reminder System** that allows users to register
 - [Passport.js](https://www.passportjs.org)
 - [Docker](https://www.docker.com)
 - [sms.ir](https://www.sms.ir) (for sending reminder SMS)
-- [Zarinpal](https://www.zarinpal.com) (for online payment)
+- [Zibal](https://www.zibal.ir) (for online payment)
+- [Redis](https://redis.io) (for OTP and caching)
+- [JWT](https://jwt.io) (for secure token-based authentication)
+- [bcrypt](https://www.npmjs.com/package/bcrypt) (for password hashing)
+- [Zod](https://zod.dev) (for data validation)
+- [CronJob](https://www.npmjs.com/package/node-cron) (for scheduling SMS reminders)
 
 ---
 
@@ -31,7 +41,7 @@ This project is a **Birthday SMS Reminder System** that allows users to register
 
 ### 1. Prerequisites
 
-Make sure that **Docker** and **Docker Compose** are installed on your system. If not, you can install them using the following links:
+Ensure that **Docker** and **Docker Compose** are installed on your system. If not, you can install them using the following links:
 
 - [Install Docker](https://docs.docker.com/get-docker/)
 - [Install Docker Compose](https://docs.docker.com/compose/install/)
@@ -41,6 +51,5 @@ Make sure that **Docker** and **Docker Compose** are installed on your system. I
 Clone the project by running the following commands:
 
 ```bash
-git clone https://github.com/username/birthday-reminder.git
-cd birthday-reminder
-```
+git clone https://github.com/majidmovahedi/sms-reminder.git
+cd sms-reminder
