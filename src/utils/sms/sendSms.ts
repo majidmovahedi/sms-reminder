@@ -29,7 +29,7 @@ export const sendSMS = async (
     try {
         const response = await axios(config);
 
-        if (response.data && response.data.isSuccessful) {
+        if (response.data) {
             return { success: true };
         } else {
             return { success: false };
