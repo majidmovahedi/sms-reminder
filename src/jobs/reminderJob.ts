@@ -57,6 +57,11 @@ export const reminderJob = cron.schedule(
                     );
                 }
             } else {
+                await Subscription.findOneAndUpdate(
+                    { userId: userId },
+                    { status: 'Expired' },
+                );
+
                 console.log(
                     `User ${userId} has no active subscription or no remaining SMS.`,
                 );
