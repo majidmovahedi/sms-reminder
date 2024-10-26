@@ -35,6 +35,6 @@ export async function adminMiddleware(
             res.status(401).json('You Dont Have Permission!');
         }
     } catch (err) {
-        console.error('Error during adminType:', err);
+        console.error('Error during to find adminType user:', err);
     }
 }

@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-//  planName, description, smsCount, price
-
 export const CreatePlanSchema = z.object({
     planName: z.string().min(3, 'planName must be at least 3 characters'),
     description: z

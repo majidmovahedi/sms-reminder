@@ -10,11 +10,12 @@ export async function listUsersController(req: Request, res: Response) {
     try {
         const users = await User.find();
         if (!users) {
-            return res.json('User Does Not Exist!');
+            return res.status(404).json('User Does Not Exist!');
         }
         return res.status(200).json(users);
     } catch (err) {
         console.error('Error finding user:', err);
+        return res.status(500).json({ message: 'Server error occurred' });
     }
 }
 
@@ -29,12 +30,13 @@ export async function singleUserController(req: Request, res: Response) {
         const user = await User.findById({ _id: new ObjectId(id) });
 
         if (!user) {
-            return res.json('This User Does Not Exist!');
+            return res.status(404).json('This User Does Not Exist!');
         }
 
         return res.status(200).json(user);
     } catch (err) {
         console.error('Error finding user by ID:', err);
+        return res.status(500).json({ message: 'Server error occurred' });
     }
 }
 
@@ -45,7 +47,7 @@ export async function adminRegisterController(req: Request, res: Response) {
 
         const findUser = await User.findOne({ phoneNumber: phoneNumber });
         if (findUser) {
-            return res.json('This PhoneNumber Exist!');
+            return res.status(409).json('This PhoneNumber Exist!');
         }
 
         const user = new User({
@@ -59,7 +61,7 @@ export async function adminRegisterController(req: Request, res: Response) {
 
         return res.status(201).json({ message: 'User registered', user });
     } catch (error) {
-        return res.status(400).json(error);
+        return res.status(500).json({ message: 'Server error occurred' });
     }
 }
 
@@ -81,14 +83,14 @@ export async function adminChangePasswordController(
         const user = await User.findById({ _id: new ObjectId(id) });
 
         if (!user) {
-            return res.json('This User Does Not Exist!');
+            return res.status(404).json('This User Does Not Exist!');
         }
 
         await User.findByIdAndUpdate(user, { password: hashedPassword });
         return res.json({ message: 'password is Changed!' });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Server error' });
+        console.error('Error During Change Password as Admin: ' + err);
+        return res.status(500).json({ message: 'Server error occurred' });
     }
 }
 
@@ -107,10 +109,10 @@ export async function adminUpdateProfileController(
         const user = await User.findById({ _id: new ObjectId(id) });
 
         if (user?.phoneNumber == phoneNumber) {
-            return res.json('This PhoneNumber is Exist!');
+            return res.status(409).json('This PhoneNumber is Exist!');
         }
         if (!user) {
-            return res.json('This User Does Not Exist!');
+            return res.status(404).json('This User Does Not Exist!');
         }
 
         await User.findByIdAndUpdate(user, {
@@ -122,6 +124,7 @@ export async function adminUpdateProfileController(
         return res.status(200).json('Profile Changed Succesfully!');
     } catch (err) {
         console.error('Error During Update User Profile ', err);
+        return res.status(500).json({ message: 'Server error occurred' });
     }
 }
 
@@ -139,18 +142,21 @@ export async function adminDeleteProfileController(
         const user = await User.findById({ _id: new ObjectId(id) });
 
         if (!user) {
-            return res.json('This User Does Not Exist!');
+            return res.status(404).json('This User Does Not Exist!');
         }
 
         // Delete User
         await User.findOneAndDelete({ _id: user });
-
-        await Subscription.deleteMany({ userId: user._id }); // Delete all subscriptions for the user
-        await Reminder.deleteMany({ userId: user._id }); // Delete all reminders for the user
-        await Payment.deleteMany({ userId: user._id }); // Delete all payments for the user
+        // Delete subscriptions for the user
+        await Subscription.deleteMany({ userId: user._id });
+        // Delete reminders for the user
+        await Reminder.deleteMany({ userId: user._id });
+        // Delete payments for the user
+        await Payment.deleteMany({ userId: user._id });
 
         return res.status(200).json('User Deleted Succesfully!');
     } catch (err) {
         console.error('Error During Delete User ', err);
+        return res.status(500).json({ message: 'Server error occurred' });
     }
 }

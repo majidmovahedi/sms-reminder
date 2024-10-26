@@ -24,8 +24,8 @@ export const CreateReminderSchema = z.object({
     minute: z
         .number()
         .int('Minute must be an integer')
-        .min(0, 'The value must be a number between 0 and 60')
-        .max(60, 'The value must be a number between 0 and 60'),
+        .min(0, 'The value must be a number between 0 and 59')
+        .max(59, 'The value must be a number between 0 and 59'),
 });
 
 export const UpdateReminderSchema = z.object({
@@ -56,7 +56,7 @@ export const UpdateReminderSchema = z.object({
     minute: z
         .number()
         .int('Minute must be an integer')
-        .min(0, 'The value must be a number between 0 and 60')
-        .max(60, 'The value must be a number between 0 and 60')
+        .min(0, 'The value must be a number between 0 and 59')
+        .max(59, 'The value must be a number between 0 and 59')
         .optional(),
 });

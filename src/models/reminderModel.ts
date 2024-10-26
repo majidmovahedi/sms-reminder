@@ -8,7 +8,6 @@ interface IReminder extends Document {
     day: number;
     hour: number;
     minute: number;
-    // userId: mongoose.Types.ObjectId;
     userId: IUser;
 }
 

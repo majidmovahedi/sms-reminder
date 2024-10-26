@@ -53,3 +53,4 @@ Clone the project by running the following commands:
 ```bash
 git clone https://github.com/majidmovahedi/sms-reminder.git
 cd sms-reminder
+```

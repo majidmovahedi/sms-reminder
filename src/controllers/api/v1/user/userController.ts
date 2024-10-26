@@ -26,11 +26,12 @@ export async function prfileController(
     try {
         const user = await User.findById({ _id: userId });
         if (!user) {
-            return res.json('This User Does Not Exist!');
+            return res.status(404).json('This User Does Not Exist!');
         }
         return res.status(200).json(user);
     } catch (err) {
         console.error('Error finding user by ID:', err);
+        return res.status(500).json({ message: 'Server error' });
     }
 }
 
@@ -41,7 +42,7 @@ export async function registerController(req: Request, res: Response) {
 
         const findUser = await User.findOne({ phoneNumber: phoneNumber });
         if (findUser) {
-            return res.json('This PhoneNumber Exist!');
+            return res.status(409).json('This PhoneNumber is already in use!');
         }
 
         const user = new User({ fullname, phoneNumber, password });
@@ -53,9 +54,14 @@ export async function registerController(req: Request, res: Response) {
             generateCode.toString(),
         );
         await sendSMS(`Your Activation Code is ${generateCode}`, phoneNumber);
-        return res.status(201).json({ message: 'User registered' });
-    } catch (error) {
-        return res.status(400).json(error);
+        return res
+            .status(201)
+            .json({
+                message: 'Registration successful! Please active your account',
+            });
+    } catch (err) {
+        console.error('Error During Register User' + err);
+        return res.status(500).json({ message: 'Server error' });
     }
 }
 
@@ -71,7 +77,7 @@ export async function loginController(req: Request, res: Response) {
                 .json({ error: 'Invalid phone number or password' });
         }
         if (user.isActive == false) {
-            return res.status(409).json({ error: 'This user is Not Active!' });
+            return res.status(403).json({ error: 'This user is Not Active!' });
         }
 
         // Check if password matches
@@ -88,8 +94,8 @@ export async function loginController(req: Request, res: Response) {
         });
         return res.json({ token });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Server error' });
+        console.error('Error During Login User' + err);
+        return res.status(500).json({ error: 'Server error' });
     }
 }
 
@@ -102,7 +108,9 @@ export async function verifyController(req: Request, res: Response) {
         if (!user) {
             return res
                 .status(401)
-                .json({ error: 'phone number does not exist!' });
+                .json({
+                    error: 'The phone number you provided is not registered. You can register using this number.',
+                });
         }
 
         const userIdStr =
@@ -112,13 +120,15 @@ export async function verifyController(req: Request, res: Response) {
 
         if (storedOtp === code) {
             await User.findByIdAndUpdate(user, { isActive: true });
-            return res.json({ message: 'User verified successfully' });
+            return res
+                .status(200)
+                .json({ message: 'User verified successfully' });
         } else {
-            res.status(400).json({ error: 'Invalid or expired OTP' });
+            return res.status(400).json({ error: 'Invalid or Expired OTP!' });
         }
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Server error' });
+        console.error('Error During Verify Account: ' + err);
+        return res.status(500).json({ error: 'Server error' });
     }
 }
 
@@ -146,8 +156,8 @@ export async function resendController(req: Request, res: Response) {
         await sendSMS(`Your Activation Code is ${generateCode}`, phoneNumber);
         return res.status(200).json({ message: 'Code Send to Mobile' });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Server error' });
+        console.error('Error During Resend Code For User: ' + err);
+        return res.status(500).json({ error: 'Server error' });
     }
 }
 
@@ -175,8 +185,8 @@ export async function forgetPasswordController(req: Request, res: Response) {
         await sendSMS(`Your Recover Code is ${generateCode}`, phoneNumber);
         return res.status(200).json({ message: 'Code Send to Mobile' });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Server error' });
+        console.error('Error During Forget Password User: ' + err);
+        return res.status(500).json({ error: 'Server error' });
     }
 }
 
@@ -200,13 +210,15 @@ export async function newPasswordController(req: Request, res: Response) {
 
         if (storedOtp === code) {
             await User.findByIdAndUpdate(user, { password: hashedPassword });
-            return res.json({ message: 'Your password is Changed!' });
+            return res
+                .status(200)
+                .json({ message: 'Your password is Changed!' });
         } else {
-            res.status(400).json({ error: 'Invalid or expired OTP' });
+            return res.status(400).json({ error: 'Invalid or expired OTP' });
         }
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Server error' });
+        console.error('Error During New Password User: ' + err);
+        return res.status(500).json({ error: 'Server error' });
     }
 }
 
@@ -219,7 +231,7 @@ export async function changePasswordController(req: Request, res: Response) {
 
         const user = await User.findById({ _id: userId });
         if (!user) {
-            return res.json('This User Does Not Exist!');
+            return res.status(404).json('This User Does Not Exist!');
         }
 
         // Check if password matches
@@ -231,10 +243,10 @@ export async function changePasswordController(req: Request, res: Response) {
         }
 
         await User.findByIdAndUpdate(user, { password: hashedPassword });
-        return res.json({ message: 'Your password is Changed!' });
+        return res.status(200).json({ message: 'Your password is Changed!' });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Server error' });
+        console.error('Error During Change Password User: ' + err);
+        return res.status(500).json({ error: 'Server error' });
     }
 }
 
@@ -245,12 +257,13 @@ export async function updateProfileController(req: Request, res: Response) {
 
         const user = await User.findById({ _id: userId });
         if (!user) {
-            return res.json('This User Does Not Exist!');
+            return res.status(404).json('This User Does Not Exist!');
         }
         await User.findByIdAndUpdate(user, { fullname: fullname });
         return res.status(200).json('Your Name Changed Succesfully!');
     } catch (err) {
         console.error('Error During Update User Profile ', err);
+        return res.status(500).json({ message: 'Server error' });
     }
 }
 
@@ -264,6 +277,7 @@ export async function deleteProfileController(req: Request, res: Response) {
         return res.status(200).json('User Deleted Succesfully!');
     } catch (err) {
         console.error('Error During Delete User ', err);
+        return res.status(500).json({ message: 'Server error' });
     }
 }
 
@@ -314,8 +328,8 @@ export async function paymentController(req: Request, res: Response) {
                 .status(500)
                 .json({ message: 'Error initiating payment' });
         }
-    } catch (error) {
-        console.error(error);
+    } catch (err) {
+        console.error('Error During Payment: ' + err);
         return res.status(500).json({ message: 'Server error' });
     }
 }

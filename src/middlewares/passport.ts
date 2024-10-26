@@ -21,7 +21,6 @@ passport.use(
                 if (!user) {
                     return done(null, false);
                 }
-                // console.log('JWT Secret:', jwtOptions.secretOrKey);
                 return done(null, user);
             } catch (err) {
                 return done(err, false);

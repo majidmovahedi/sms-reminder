@@ -4,6 +4,7 @@ dotenv.config();
 
 const lineNumber = process.env.SMS_LINE_NUMBER;
 const apiKey = process.env.SMS_API_KEY;
+const smsConfigUrl = process.env.SMS_CONFIG_URL;
 
 export const sendSMS = async (
     msg: string,
@@ -18,7 +19,7 @@ export const sendSMS = async (
 
     const config = {
         method: 'post',
-        url: 'https://api.sms.ir/v1/send/bulk',
+        url: smsConfigUrl,
         headers: {
             'X-API-KEY': apiKey,
             'Content-Type': 'application/json',
@@ -35,7 +36,7 @@ export const sendSMS = async (
             return { success: false };
         }
     } catch (error) {
-        console.error('Error sending SMS:', error);
+        console.error('Error Sending SMS:', error);
         return { success: false };
     }
 };

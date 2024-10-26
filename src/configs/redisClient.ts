@@ -3,7 +3,7 @@ import { createClient, RedisClientType } from 'redis';
 const redisURL = process.env.REDIS_URL;
 
 const redisClient: RedisClientType = createClient({
-    url: redisURL, // Adjust the URL as needed
+    url: redisURL,
 });
 
 redisClient.on('error', (err) => {
