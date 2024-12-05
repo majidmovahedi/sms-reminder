@@ -54,11 +54,9 @@ export async function registerController(req: Request, res: Response) {
             generateCode.toString(),
         );
         await sendSMS(`Your Activation Code is ${generateCode}`, phoneNumber);
-        return res
-            .status(201)
-            .json({
-                message: 'Registration successful! Please active your account',
-            });
+        return res.status(201).json({
+            message: 'Registration successful! Please active your account',
+        });
     } catch (err) {
         console.error('Error During Register User' + err);
         return res.status(500).json({ message: 'Server error' });
@@ -106,11 +104,9 @@ export async function verifyController(req: Request, res: Response) {
         // Find user by phone number
         const user = await User.findOne({ phoneNumber });
         if (!user) {
-            return res
-                .status(401)
-                .json({
-                    error: 'The phone number you provided is not registered. You can register using this number.',
-                });
+            return res.status(401).json({
+                error: 'The phone number you provided is not registered. You can register using this number.',
+            });
         }
 
         const userIdStr =
